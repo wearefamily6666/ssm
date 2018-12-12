@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imooc.dao.IGroupDao" >
+  <resultMap id="BaseResultMap" type="com.imooc.pojo.Group" >
+    <id column="gid" property="gid" jdbcType="INTEGER" />
+    <result column="groupname" property="groupname" jdbcType="VARCHAR" />
+    <result column="groupnotice" property="groupnotice" jdbcType="VARCHAR" />
+  </resultMap>
+    <resultMap id="UserResultMap" type="com.imooc.pojo.User" >
+    <id column="uid" property="id" jdbcType="INTEGER" />
+    <result column="userName" property="username" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    gid, groupname, groupnotice
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_group
+    where gid = #{gid,jdbcType=INTEGER}
+  </select>
+  <select id="getUser" resultMap="UserResultMap">
+  	select * from t_user u inner join user_group_relation u2 on u.uid=u2.uid inner join t_group g on u2.gid=g.gid where u.uid=5
+  </select>
+  <select id="getUserByLeftJoin" resultType="com.imooc.pojo.User">
+  	select * from t_user u left join user_group_relation u2 on u.uid=u2.uid
+   </select>
+   <select id="getGroup" resultType="string">
+   	select distinct groupname from t_group
+   </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_group
+    where gid = #{gid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.imooc.pojo.Group" >
+    insert into t_group (gid, groupname, groupnotice
+      )
+    values (#{gid,jdbcType=INTEGER}, #{groupname,jdbcType=VARCHAR}, #{groupnotice,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.imooc.pojo.Group" >
+    insert into t_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="gid != null" >
+        gid,
+      </if>
+      <if test="groupname != null" >
+        groupname,
+      </if>
+      <if test="groupnotice != null" >
+        groupnotice,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="gid != null" >
+        #{gid,jdbcType=INTEGER},
+      </if>
+      <if test="groupname != null" >
+        #{groupname,jdbcType=VARCHAR},
+      </if>
+      <if test="groupnotice != null" >
+        #{groupnotice,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.imooc.pojo.Group" >
+    update t_group
+    <set >
+      <if test="groupname != null" >
+        groupname = #{groupname,jdbcType=VARCHAR},
+      </if>
+      <if test="groupnotice != null" >
+        groupnotice = #{groupnotice,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where gid = #{gid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.imooc.pojo.Group" >
+    update t_group
+    set groupname = #{groupname,jdbcType=VARCHAR},
+      groupnotice = #{groupnotice,jdbcType=VARCHAR}
+    where gid = #{gid,jdbcType=INTEGER}
+  </update>
+</mapper>

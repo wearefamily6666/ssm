@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.imooc.dao.IDepartmentDao" >
+  <resultMap id="BaseResultMap" type="com.imooc.pojo.Department" >
+    <id column="DID" property="did" jdbcType="INTEGER" />
+    <result column="DNAME" property="dname" jdbcType="VARCHAR" />
+    <result column="DDESC" property="ddesc" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    DID, DNAME, DDESC
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from department
+    where DID = #{did,jdbcType=INTEGER}
+  </select>
+  <select id="selectEmployeesByDid" resultType="com.imooc.pojo.Employee" parameterType="java.lang.Integer">
+  	select * from employee where did=#{did}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from department
+    where DID = #{did,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.imooc.pojo.Department" >
+    insert into department (DID, DNAME, DDESC
+      )
+    values (#{did,jdbcType=INTEGER}, #{dname,jdbcType=VARCHAR}, #{ddesc,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.imooc.pojo.Department" >
+    insert into department
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="did != null" >
+        DID,
+      </if>
+      <if test="dname != null" >
+        DNAME,
+      </if>
+      <if test="ddesc != null" >
+        DDESC,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="did != null" >
+        #{did,jdbcType=INTEGER},
+      </if>
+      <if test="dname != null" >
+        #{dname,jdbcType=VARCHAR},
+      </if>
+      <if test="ddesc != null" >
+        #{ddesc,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.imooc.pojo.Department" >
+    update department
+    <set >
+      <if test="dname != null" >
+        DNAME = #{dname,jdbcType=VARCHAR},
+      </if>
+      <if test="ddesc != null" >
+        DDESC = #{ddesc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where DID = #{did,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.imooc.pojo.Department" >
+    update department
+    set DNAME = #{dname,jdbcType=VARCHAR},
+      DDESC = #{ddesc,jdbcType=VARCHAR}
+    where DID = #{did,jdbcType=INTEGER}
+  </update>
+</mapper>
