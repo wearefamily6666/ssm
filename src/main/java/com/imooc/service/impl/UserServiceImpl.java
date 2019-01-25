@@ -1,13 +1,16 @@
 package com.imooc.service.impl;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.imooc.dao.IUserDao;
-import com.imooc.pojo.Employee;
 import com.imooc.pojo.User;
 import com.imooc.service.IUserService;
 /**
@@ -21,8 +24,12 @@ public class UserServiceImpl implements IUserService {
     @Resource  
     private IUserDao userDao;  
     
+    @Value("${TEST_URL}")
+    private String teString;
+ 
     public User getUserById(int userId) {  
         // TODO Auto-generated method stub 
+    	System.out.println("获得properties属性值：  "+teString);
     		return this.userDao.selectByPrimaryKey(userId); 
     }
 

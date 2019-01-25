@@ -16,10 +16,10 @@
     from t_user
     where uid = #{id,jdbcType=INTEGER}
   </select>
-  <select id="selectAll" resultType="com.imooc.pojo.User" >
+  <select id="selectAll" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from t_user
+    from t_user order by uid desc
   </select>
   <select id="getCount" resultType="java.lang.Integer">
   	select count(*) from t_user
@@ -87,5 +87,5 @@
       age = #{age,jdbcType=INTEGER}
     where uid = #{id,jdbcType=INTEGER}
   </update>
- 
+ 	
 </mapper>

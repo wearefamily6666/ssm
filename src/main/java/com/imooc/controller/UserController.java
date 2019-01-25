@@ -16,16 +16,24 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.WebParam.Mode;
+import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.swing.plaf.synth.SynthInternalFrameUI;
 import javax.ws.rs.Encoded;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -44,25 +52,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.w3c.dom.ls.LSInput;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.imooc.pojo.Group;
 import com.imooc.pojo.User;
 import com.imooc.service.IUserService;
   
 @Controller  
 @RequestMapping("/user")  
 // /user/**
-public class UserController {  
+public class UserController {
+	
      @Resource  
-     private IUserService userService;     
-    
- // /user/showUser2?id=1
+     private IUserService userService;   
+     
+     @Value("${TEST_URL}")
+     private String test_url;
+     
     @RequestMapping(value="/showUser2")  
     @ResponseBody
-
-    public String toIndex2(    int id ,float param){  
+    public String toIndex2( int id ){  
+    	System.out.println("userController:  "+test_url);
+    	
         User user = this.userService.getUserById(id);
         return user.toString();
     }  
@@ -72,16 +82,33 @@ public class UserController {
     public String showUploadPage(){
         return "file";
     }
+    //文件上传
+    @RequestMapping("/index")
+    public String index(){
+        return "forward:/user/upload";
+    }
     
-    @RequestMapping(value="/doUpload",method=RequestMethod.POST)
+/*    @RequestMapping(value="/doUpload",method=RequestMethod.POST)
     public String doUploadFile(@RequestParam("file")MultipartFile file) throws IOException{
         if (!file.isEmpty()) {
         	System.out.println("fileName:   "+file.getOriginalFilename());
         }
         FileUtils.copyInputStreamToFile(file.getInputStream(), new File("F:\\temp/",System.currentTimeMillis()+file.getOriginalFilename()));
         return "success";
+    }*/
+    @RequestMapping(value="/doUpload")
+    public String doUploadFile2(MultipartFile file,HttpServletRequest request) throws IOException{
+    	String  username=request.getParameter("username");
+    	String  password=request.getParameter("password");
+    	System.out.println("username:   "+username+"         password:     "+password);
+        if (!file.isEmpty()) {
+        	System.out.println("fileName:   "+file.getOriginalFilename());
+        	   FileUtils.copyInputStreamToFile(file.getInputStream(), new File("F:\\temp/",System.currentTimeMillis()+file.getOriginalFilename()));
+        	   return "success";
+        }
+        return "file";
     }
-    @RequestMapping("/test")
+    @RequestMapping(value="/test",method=RequestMethod.GET)
     public String test(){
         return "test";
     }
@@ -150,10 +177,32 @@ public class UserController {
         	}
         	return list;
         }
+        @RequestMapping(value="/getList")
+        public String getList(Model model) {
+        	ArrayList<HashMap<String, Object>> list=new ArrayList<HashMap<String,Object>>();
+/*        	for(int i=0;i<10;i++) {
+        		HashMap<String, Object> map=new HashMap<String, Object>();
+            	map.put("grade", "软件162");
+            	map.put("sum", 50);
+            	list.add(map);
+        	}*/
+        	model.addAttribute("list", list);
+        	return "test";
+        }
+        @RequestMapping("/model")
+        public String model(Model model) {
+        	model.addAttribute("username", "zs");
+        	model.addAttribute("age",22);
+        	return "test";
+        }
         @RequestMapping("/request")
         public String request(Map<String, Object> map){
-           map.put("rr", "test");
+           map.put("gender", "female");
             return "test";
+        }
+        @RequestMapping("/eltest")
+        public String eltest(){
+            return "eltest";
         }
         @RequestMapping("/session")
         public String session(HttpServletRequest request) {
@@ -178,5 +227,28 @@ public class UserController {
 				}
 			}
         	return "success";
+        }
+        @RequestMapping("/shirotest")
+        @ResponseBody
+        public String testShiro() {
+   		 //2.主体提交认证请求
+        	try {
+          		 Subject subject=SecurityUtils.getSubject();
+           		 UsernamePasswordToken token=new UsernamePasswordToken("Mark", "123456");
+           		 subject.login(token);
+           		 return "登录成功";
+			} catch (Exception e) {
+				return e.getMessage();
+			}
+        }
+        @RequestMapping(value="/testRole",method=RequestMethod.GET)
+        @ResponseBody
+        public String testRole() {
+        	return "testRole success";
+        }
+        @RequestMapping(value="/testRole1",method=RequestMethod.GET)
+        @ResponseBody
+        public String testRole1() {
+        	return "testRole1 success";
         }
 }  
